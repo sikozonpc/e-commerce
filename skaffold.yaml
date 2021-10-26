@@ -1,0 +1,19 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl: # Watch everything inside k8s directory. So we dont have to wrtie `kubctl apply` everytime
+    manifests: # it also removes all objects related to these config files when we shutdown skaffold.
+      - ./infra/k8s/*
+      - ./infra/k8s-dev/*
+build:
+  local:
+    push: false
+  artifacts: # Pods we need to mantain
+    - image: cowculator99/ecom-product
+      context: services/product # directory name
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.{ts, js}" # change watcher (if some change doesn't match it will completly rebuild the project instead)
+            dest: .
