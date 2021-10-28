@@ -17,6 +17,11 @@ kubectl create secret generic jwt-secret --from-literal=JWT_KEY=132
 skafold dev
 ```
 
+Access MongoDB pods from external IDE by exposing, for example:
+```bash
+kubectl port-forward service/product-mongo-service 27017:27017
+```
+
 
 ## Resources and Inspiration
 
