@@ -3,6 +3,7 @@ import Hapi, { RouteOptions } from '@hapi/hapi';
 import Boom from '@hapi/boom';
 import { User } from '../../models/user';
 import { generateAuthToken } from '../../services/jwt';
+import { AUTH_COOKIE_NAME } from '@ecomtiago/common';
 
 interface RegisterPayload {
   username: string;
@@ -34,7 +35,7 @@ export const createRegisterAuth: RouteOptions = {
       };
       return h.response(userResponse)
         .code(200)
-        .state('ecom-a-t', authToken); // TODO: Consume cookie name from common
+        .state(AUTH_COOKIE_NAME, authToken);
     } catch (error) {
       return Boom.badImplementation((error as any).message);
     }

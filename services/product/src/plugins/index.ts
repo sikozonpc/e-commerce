@@ -1,5 +1,5 @@
 import { productPlugin } from './products';
-import { requireAuthPlugin } from './products/auth/require-auth';
+import { requireAuthPlugin } from '@ecomtiago/common';
 
 export const plugins = [
   requireAuthPlugin,

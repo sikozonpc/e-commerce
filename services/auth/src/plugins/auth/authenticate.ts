@@ -4,6 +4,7 @@ import Boom from '@hapi/boom';
 import { User } from '../../models/user';
 import { generateAuthToken } from '../../services/jwt';
 import { PasswordService } from '../../services/password';
+import { AUTH_COOKIE_NAME } from '@ecomtiago/common';
 
 interface LoginPayload {
   username: string;
@@ -33,7 +34,7 @@ export const createAuthenticateAuth: RouteOptions = {
       const authToken = generateAuthToken(user);
       return h.response()
         .code(200)
-        .state('ecom-a-t', authToken); // TODO: Consume cookie name from common
+        .state(AUTH_COOKIE_NAME, authToken);
     } catch (error) {
       return Boom.badImplementation((error as any).message);
     }
