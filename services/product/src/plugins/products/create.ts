@@ -7,6 +7,7 @@ import { Product, ProductDocument } from '../../models/product';
 interface CreatePostPayload {
   title: ProductDocument['title'],
   price: ProductDocument['price'],
+  quantity: ProductDocument['quantity'],
 }
 
 export const createPostProducts: RouteOptions = {
@@ -14,12 +15,13 @@ export const createPostProducts: RouteOptions = {
     payload: Joi.object({
       title: Joi.string(),
       price: Joi.number(),
+      quantity: Joi.number().optional(),
     }),
   },
   handler: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
-    const { price, title } = request.payload as CreatePostPayload;
+    const { price, title, quantity = 0 } = request.payload as CreatePostPayload;
     try {
-      const product = Product.build({ price, title });
+      const product = Product.build({ price, title, quantity });
       await product.save();
 
       // Emit product created event

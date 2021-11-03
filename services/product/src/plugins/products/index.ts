@@ -24,5 +24,6 @@ export const register = (server: Hapi.Server) => server.route(
 
 export const productPlugin = {
   name: 'app/products',
+  dependencies: ['@ecom/auth'],
   register,
 };

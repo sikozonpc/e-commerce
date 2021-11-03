@@ -4,6 +4,7 @@ interface ProductAttributes {
   title: string;
   price: number;
   description?: string;
+  quantity: number;
 }
 
 export interface ProductDocument extends mongoose.Document, ProductAttributes { }
@@ -18,6 +19,11 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   price: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  quantity: {
     type: Number,
     required: true,
     min: 0,
