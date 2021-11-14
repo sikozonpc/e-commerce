@@ -3,11 +3,12 @@ import mongoose from 'mongoose';
 import Hapi, { RequestAuth, RouteOptions } from '@hapi/hapi';
 import Joi from 'joi';
 import { Order, OrderStatus } from '../../models/order';
-import { Product, ProductDocument } from '../../models/product';
+import { Product } from '../../models/product';
+import { areProductsValid, findProductWithNotEnoughStock } from '../services/order';
 
 const EXPIRATION_ORDER_SECONDS = 15 * 60 // 15 mins
 
-type OrderProduct = { id: string; quantity: number; coupon?: string };
+export type OrderProduct = { id: string; quantity: number; coupon?: string };
 
 interface CreateOrderPayload {
   products: OrderProduct[];
@@ -19,21 +20,6 @@ export interface AuthenticatedRequest extends Hapi.Request {
       id: string;
     }
   } & RequestAuth;
-}
-
-export const findProductWithNotEnoughStock = async (
-  fetchedProducts: ProductDocument[],
-  requestProducts: OrderProduct[],
-) => fetchedProducts.find((product) => {
-  const requestedProduct = requestProducts.find(p => p.id === product.id);
-  if (!requestedProduct) return;
-
-  const hasEnoughStock = product.quantity < requestedProduct.quantity;
-  if (hasEnoughStock) return true;
-});
-
-function areProductsValid(products: (ProductDocument | null)[]): products is ProductDocument[] {
-  return !products.includes(null);
 }
 
 export const createPostOrders: RouteOptions = {
