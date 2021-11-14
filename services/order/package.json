@@ -19,11 +19,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ecomtiago/common": "^1.0.6",
     "@hapi/boom": "^9.1.4",
     "@hapi/hapi": "^20.2.1",
     "@types/hapi__hapi": "^20.0.9",
     "@types/mongoose": "^5.10.5",
     "joi": "^17.4.2",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.19",
     "ts-node-dev": "^1.1.8"
   },

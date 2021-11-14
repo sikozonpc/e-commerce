@@ -29,21 +29,3 @@ afterAll(async () => {
   await mongodb.stop();
   await mongoose.connection.close();
 })
-
-export const registerTestUser = () => {
-  if (!process.env.JWT_KEY) {
-    throw new Error('no JWT_KEY has been set.');
-  };
-
-  const payload = {
-    id: new mongoose.Types.ObjectId().toHexString(),
-    password: 'some-password',
-  };
-  const token = jwt.sign(payload, process.env.JWT_KEY!);
-  const session = { jwt: token };
-
-  const sessionJSON = JSON.stringify(session);
-  const base64Enconded = Buffer.from(sessionJSON).toString('base64');
-
-  return [`express:sess=${base64Enconded}`]; // FIXME: Change this
-};

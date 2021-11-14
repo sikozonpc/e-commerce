@@ -1,66 +1,93 @@
 import Boom from '@hapi/boom';
 import mongoose from 'mongoose';
-import Hapi, { RouteOptions } from '@hapi/hapi';
+import Hapi, { RequestAuth, RouteOptions } from '@hapi/hapi';
 import Joi from 'joi';
-import { Order, OrderModelDocument, OrderStatus } from '../../models/order';
-import { Product } from '../../models/product';
+import { Order, OrderStatus } from '../../models/order';
+import { Product, ProductDocument } from '../../models/product';
 
 const EXPIRATION_ORDER_SECONDS = 15 * 60 // 15 mins
 
+type OrderProduct = { id: string; quantity: number; coupon?: string };
+
 interface CreateOrderPayload {
-  productIds: {
-    [id: string]: {
-      quantity: number;
-      coupon?: string;
-    };
-  }
+  products: OrderProduct[];
+}
+
+export interface AuthenticatedRequest extends Hapi.Request {
+  auth: {
+    credentials: {
+      id: string;
+    }
+  } & RequestAuth;
+}
+
+export const findProductWithNotEnoughStock = async (
+  fetchedProducts: ProductDocument[],
+  requestProducts: OrderProduct[],
+) => fetchedProducts.find((product) => {
+  const requestedProduct = requestProducts.find(p => p.id === product.id);
+  if (!requestedProduct) return;
+
+  const hasEnoughStock = product.quantity < requestedProduct.quantity;
+  if (hasEnoughStock) return true;
+});
+
+function areProductsValid(products: (ProductDocument | null)[]): products is ProductDocument[] {
+  return !products.includes(null);
 }
 
 export const createPostOrders: RouteOptions = {
   validate: {
     payload: Joi.object({
-      productIds: Joi.object().keys({
+      products: Joi.array().items({
+        id: Joi.string().required(),
         quantity: Joi.number().required(),
         coupon: Joi.string(),
-      })
-        .unknown(true),
+      }),
     }),
   },
-  handler: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
-    const { productIds } = request.payload as CreateOrderPayload;
+  handler: async (request: AuthenticatedRequest, h: Hapi.ResponseToolkit) => {
+    const { products: requestedProduct } = request.payload as CreateOrderPayload;
+    const { credentials } = request.auth;
     try {
-      const validProducts = Object.entries(productIds)
-        .filter(async ([productId, { quantity }]) => {
-          const product = await Product.findById(productId);
-          if (!product || product.quantity <= quantity) return;
-          return product;
-        });
+      const fetchedProducts = await Promise.all(
+        requestedProduct.map(({ id }) => Product.findById(id)),
+      );
 
-      const areAllProductsValid = validProducts.length === Object.keys(productIds).length;
-      if (!areAllProductsValid) {
-        return h.response('invalid products').code(400);
+      if (!areProductsValid(fetchedProducts)) {
+        const invalidProductIndex = fetchedProducts.indexOf(null);
+        return h.response({
+          message: `product ${requestedProduct[invalidProductIndex].id} does not exist`,
+        }).code(400);
+      }
+
+      const productWithNoStock = await findProductWithNotEnoughStock(fetchedProducts, requestedProduct);
+      if (productWithNoStock) {
+        return h.response({
+          message: `product ${productWithNoStock.id} does not have enough stock`,
+        }).code(400);
       }
 
       const expiresAt = new Date();
       expiresAt.setSeconds(expiresAt.getSeconds() + EXPIRATION_ORDER_SECONDS);
 
-      const products = await Product.find({
-        id: {
-          $in: validProducts.map(([productId]) => new mongoose.Types.ObjectId(productId)),
+      const orderedProducts = await Product.find({
+        _id: {
+          $in: fetchedProducts.map((product) => new mongoose.Types.ObjectId(product.id)),
         }
       });
-
+      
       const order = Order.build({
-        userId: 'asd', // request.currentUser!.id
+        userId: credentials.id,
         expiresAt,
         status: OrderStatus.Created,
-        products,
+        products: orderedProducts,
       });
       await order.save();
 
       // Emit order created event
 
-      return h.response(order).code(201);
+      return h.response(order).code(200);
     } catch (error) {
       if (error instanceof Error) {
         throw Boom.badRequest(error.message);

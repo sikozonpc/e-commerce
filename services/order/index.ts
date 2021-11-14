@@ -5,6 +5,9 @@ import { createServer, startServer } from './src/server';
   if (!process.env.MONGO_URI) {
     throw new Error('Env MONGO_URI not found!');
   }
+  if (!process.env.JWT_KEY) {
+    throw new Error('JWT_KEY is required');
+  }
 
   try {
     let server = await createServer();
