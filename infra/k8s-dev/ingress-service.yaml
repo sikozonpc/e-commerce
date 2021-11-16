@@ -18,3 +18,7 @@ spec:
             backend:
               serviceName: auth-service
               servicePort: 3000
+          - path: /api/order/?(.*)
+            backend:
+              serviceName: order-service
+              servicePort: 3000

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-depl
+  labels:
+    app: ecom-order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-order
+  template:
+    metadata:
+      labels:
+        app: ecom-order
+    spec:
+      containers:
+        - name: order
+          image: cowculator99/ecom-order:latest
+          env:
+            - name: MONGO_URI
+              value: mongodb://order-mongo-service:27017/order
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: ecom-order
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

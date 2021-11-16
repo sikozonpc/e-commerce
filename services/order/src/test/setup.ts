@@ -36,6 +36,7 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
+// TODO: Could be moved to the common library
 export const registerTestSession = () => {
   if (!process.env.JWT_KEY) {
     throw new Error('no JWT_KEY has been set.');
