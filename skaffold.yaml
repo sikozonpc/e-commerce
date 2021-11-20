@@ -25,3 +25,11 @@ build:
         manual:
           - src: "src/**/*.{ts, js}" # change watcher (if some change doesn't match it will completly rebuild the project instead)
             dest: .
+    - image: cowculator99/ecom-order
+      context: services/order # directory name
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.{ts, js}" # change watcher (if some change doesn't match it will completly rebuild the project instead)
+            dest: .

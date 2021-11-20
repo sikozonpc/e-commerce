@@ -1,10 +1,11 @@
 import Boom from '@hapi/boom';
 import mongoose from 'mongoose';
-import Hapi, { RequestAuth, RouteOptions } from '@hapi/hapi';
+import Hapi, { RouteOptions } from '@hapi/hapi';
 import Joi from 'joi';
 import { Order, OrderStatus } from '../../models/order';
 import { Product } from '../../models/product';
 import { areProductsValid, findProductWithNotEnoughStock } from '../services/order';
+import { AuthenticatedRequest } from '@ecomtiago/common';
 
 const EXPIRATION_ORDER_SECONDS = 15 * 60 // 15 mins
 
@@ -12,14 +13,6 @@ export type OrderProduct = { id: string; quantity: number; coupon?: string };
 
 interface CreateOrderPayload {
   products: OrderProduct[];
-}
-
-export interface AuthenticatedRequest extends Hapi.Request {
-  auth: {
-    credentials: {
-      id: string;
-    }
-  } & RequestAuth;
 }
 
 export const createPostOrders: RouteOptions = {
@@ -62,7 +55,7 @@ export const createPostOrders: RouteOptions = {
           $in: fetchedProducts.map((product) => new mongoose.Types.ObjectId(product.id)),
         }
       });
-      
+
       const order = Order.build({
         userId: credentials.id,
         expiresAt,

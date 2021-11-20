@@ -2,10 +2,9 @@ import request from 'supertest';
 import Hapi from '@hapi/hapi';
 import { createServer } from '../../server';
 import mongoose from 'mongoose';
-import { createProduct, registerTestSession } from '../../test/setup';
-import { AUTH_COOKIE_NAME } from '@ecomtiago/common';
+import { createProduct } from '../../test/setup';
+import { AUTH_COOKIE_NAME, registerTestSession } from '@ecomtiago/common';
 import { OrderStatus } from '../../models/order';
-
 
 describe('order create', () => {
   let server: Hapi.Server | null = null;
@@ -13,7 +12,9 @@ describe('order create', () => {
 
   beforeAll(async () => {
     server = await createServer();
-    authSession = `${AUTH_COOKIE_NAME}=${registerTestSession()};`;
+    authSession = `${AUTH_COOKIE_NAME}=${registerTestSession({
+      id: new mongoose.Types.ObjectId().toHexString(),
+    })};`;
   });
 
   it('throws a 401 if not authenticated', () => {
