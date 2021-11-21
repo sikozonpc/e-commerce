@@ -1,5 +1,5 @@
-import { ProductDocument } from '../../../models/product';
-import { OrderProduct } from '../../orders/create';
+import { ProductDocument } from '../../models/product';
+import { OrderProduct } from '../../plugins/orders/create';
 
 export const findProductWithNotEnoughStock = async (
   fetchedProducts: ProductDocument[],

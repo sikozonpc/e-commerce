@@ -47,6 +47,7 @@ describe('order create', () => {
 
   it('throws an error message when some of the requested products do not have enough stock', async () => {
     const product = await createProduct({
+      id: mongoose.Types.ObjectId().toString(),
       price: 42, quantity: 1, title: 'Some product',
     });
 
@@ -64,9 +65,11 @@ describe('order create', () => {
 
   it('successfully creates an order', async () => {
     const productOne = await createProduct({
+      id: mongoose.Types.ObjectId().toString(),
       price: 42, quantity: 42, title: 'Some product 1',
     });
     const productTwo = await createProduct({
+      id: mongoose.Types.ObjectId().toString(),
       price: 69, quantity: 100, title: 'Some product 2',
     });
 

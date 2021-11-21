@@ -23,6 +23,9 @@ const deferCloseNatsWrapper = async (stan: Stan) => {
 }
 
 (async () => {
+  if (!process.env.JWT_KEY) {
+    throw new Error('JWT_KEY is required');
+  }
   if (!process.env.MONGO_URI) {
     throw new Error('Env MONGO_URI not found!');
   }

@@ -4,7 +4,7 @@ import Hapi, { RouteOptions } from '@hapi/hapi';
 import Joi from 'joi';
 import { Order, OrderStatus } from '../../models/order';
 import { Product } from '../../models/product';
-import { areProductsValid, findProductWithNotEnoughStock } from '../services/order';
+import { areProductsValid, findProductWithNotEnoughStock } from '../../services/order';
 import { AuthenticatedRequest } from '@ecomtiago/common';
 
 const EXPIRATION_ORDER_SECONDS = 15 * 60 // 15 mins
@@ -20,7 +20,7 @@ export const createPostOrders: RouteOptions = {
     payload: Joi.object({
       products: Joi.array().items({
         id: Joi.string().required(),
-        quantity: Joi.number().required(),
+        quantity: Joi.number().min(0).positive().required(),
         coupon: Joi.string(),
       }),
     }),
