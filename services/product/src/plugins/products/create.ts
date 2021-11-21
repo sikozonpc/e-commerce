@@ -1,8 +1,9 @@
-
 import Boom from '@hapi/boom';
 import Hapi, { RouteOptions } from '@hapi/hapi';
 import Joi from 'joi';
+import { ProductCreatedPublisher } from '../../events/publishers/product-created-publisher';
 import { Product, ProductDocument } from '../../models/product';
+import { natsWrapper } from '../../nats-wrapper';
 
 interface CreatePostPayload {
   title: ProductDocument['title'],
@@ -25,6 +26,12 @@ export const createPostProducts: RouteOptions = {
       await product.save();
 
       // Emit product created event
+      await new ProductCreatedPublisher(natsWrapper.client).publish({
+        id: product.id,
+        price: product.price,
+        quantity: product.quantity,
+        title: product.title,
+      });
 
       return h.response(product).code(201);
     } catch (error) {

@@ -1,5 +1,26 @@
+import { Stan } from 'node-nats-streaming';
 import { connect } from './db';
+import { natsWrapper } from './src/nats-wrapper';
 import { createServer, startServer } from './src/server';
+
+const deferCloseNatsWrapper = async (stan: Stan) => {
+  new Promise<void>((resolve) => {
+    stan.on('close', () => {
+      console.log('NATS connection closed!');
+      resolve();
+      process.exit();
+    });
+
+    process.on('SIGINT', () => {
+      stan.close();
+      resolve();
+    });
+    process.on('SIGTERM', () => {
+      stan.close();
+      resolve();
+    });
+  })
+}
 
 (async () => {
   if (!process.env.MONGO_URI) {
@@ -8,8 +29,24 @@ import { createServer, startServer } from './src/server';
   if (!process.env.JWT_KEY) {
     throw new Error('JWT_KEY is required');
   }
+  if (!process.env.NATS_URL) {
+    throw new Error('Env NATS_URL not found!');
+  }
+  if (!process.env.NATS_CLIENT_ID) {
+    throw new Error('Env NATS_CLIENT_ID not found!');
+  }
+  if (!process.env.NATS_CLUSTER_ID) {
+    throw new Error('Env MONGO_URI not found!');
+  }
 
   try {
+    await natsWrapper.connect(
+      process.env.NATS_CLUSTER_ID,
+      process.env.NATS_CLIENT_ID,
+      process.env.NATS_URL,
+    );
+    await deferCloseNatsWrapper(natsWrapper.client);
+
     let server = await createServer();
 
     await connect(process.env.MONGO_URI);
