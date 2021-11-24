@@ -1,5 +1,10 @@
 import nats, { Stan } from 'node-nats-streaming';
 
+/**
+ * NATS streamming singleton
+ * Initialize it once on the starting point on the project and access it later
+ * as an instance.
+ */
 class NatsWrapper {
   private _client?: Stan;
   get client() {

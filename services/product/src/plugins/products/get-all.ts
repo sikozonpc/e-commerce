@@ -1,5 +1,3 @@
-
-import Boom from '@hapi/boom';
 import Hapi, { RouteOptions } from '@hapi/hapi';
 import { Product } from '../../models/product';
 

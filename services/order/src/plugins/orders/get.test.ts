@@ -25,6 +25,7 @@ describe('order get all', () => {
 
   it('should return the user\'s orders', async () => {
     const productOne = await createProduct({
+      id: mongoose.Types.ObjectId().toString(),
       price: 42, quantity: 3, title: 'Some product 1',
     });
 

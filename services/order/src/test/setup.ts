@@ -2,6 +2,8 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { Product, ProductAttributes } from '../models/product';
 
+jest.mock('../nats-wrapper');
+
 let mongodb: MongoMemoryServer | null = null;
 
 beforeAll(async () => {

@@ -1,6 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+
+jest.mock('../nats-wrapper');
 
 let mongodb: MongoMemoryServer | null = null;
 
@@ -10,7 +11,11 @@ beforeAll(async () => {
   mongodb = await MongoMemoryServer.create();
   const mongodbURI = mongodb?.getUri();
 
-  await mongoose.connect(mongodbURI)
+  await mongoose.connect(mongodbURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  });
 });
 
 beforeEach(async () => {
