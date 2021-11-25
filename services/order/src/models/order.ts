@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { ProductDocument } from './product';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 export enum OrderStatus {
   Created = 'created',
@@ -15,7 +16,9 @@ interface OrderModelAttributes {
   userId: string;
 }
 
-export interface OrderModelDocument extends mongoose.Document, OrderModelAttributes { }
+export interface OrderModelDocument extends mongoose.Document, OrderModelAttributes {
+  version: number;
+}
 
 interface OrderModelModel extends mongoose.Model<OrderModelDocument> {
   build: (attrs: OrderModelAttributes) => OrderModelDocument;
@@ -50,6 +53,9 @@ const orderSchema = new mongoose.Schema({
   },
 });
 
+// Implements "Optimistic Concurrency Control"
+orderSchema.set('versionKey', 'version');
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (attrs: OrderModelAttributes) => new Order(attrs);
 

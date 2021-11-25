@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 export interface ProductAttributes {
   id: string;
@@ -7,7 +8,9 @@ export interface ProductAttributes {
   quantity: number;
 }
 
-export interface ProductDocument extends mongoose.Document, Omit<ProductAttributes, 'id'> { }
+export interface ProductDocument extends mongoose.Document, Omit<ProductAttributes, 'id'> {
+  version: number;
+}
 
 interface ProductModel extends mongoose.Model<ProductDocument> {
   build: (attrs: ProductAttributes) => ProductDocument;
@@ -36,6 +39,10 @@ const productSchema = new mongoose.Schema({
     },
   },
 });
+
+// Implements "Optimistic Concurrency Control"
+productSchema.set('versionKey', 'version');
+productSchema.plugin(updateIfCurrentPlugin);
 
 productSchema.statics.build = (attrs: ProductAttributes) => {
   const { id, ...props } = attrs;

@@ -19,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ecomtiago/common": "^1.0.9",
+    "@ecomtiago/common": "^1.0.10",
     "@hapi/boom": "^9.1.4",
     "@hapi/hapi": "^20.2.1",
     "@types/hapi__hapi": "^20.0.9",
@@ -28,6 +28,7 @@
     "hapi-auth-jwt2": "^10.2.0",
     "joi": "^17.4.2",
     "mongoose": "^5.10.19",
+    "mongoose-update-if-current": "^1.4.0",
     "node-nats-streaming": "^0.3.2",
     "ts-node-dev": "^1.1.8"
   },
