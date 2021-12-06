@@ -2,6 +2,7 @@ import Hapi from '@hapi/hapi'
 import { createPostProducts } from './create';
 import { createDeleteProduct } from './delete';
 import { createGetProducts } from './get-all';
+import { createUpdateProduct } from './update';
 export const register = (server: Hapi.Server) => server.route(
   [
     {
@@ -16,8 +17,13 @@ export const register = (server: Hapi.Server) => server.route(
     },
     {
       method: 'DELETE',
-      path: '/api/products/{id}',
+      path: '/api/products/{productId}',
       options: createDeleteProduct,
+    },
+    {
+      method: 'PATCH',
+      path: '/api/products/{productId}',
+      options: createUpdateProduct,
     },
   ]
 );

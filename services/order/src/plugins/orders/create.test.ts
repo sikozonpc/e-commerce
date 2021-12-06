@@ -17,20 +17,20 @@ describe('order create', () => {
     })};`;
   });
 
-  it('throws a 401 if not authenticated', () => {
+  it('should throw a 401 if not authenticated', () => {
     return request(server?.listener).post('/api/orders')
       .send({})
       .expect(401);
   });
 
-  it('fails with invalid payload', async () => {
+  it('should fail with invalid payload', async () => {
     return request(server?.listener).post('/api/orders')
       .send({ price: 42 })
       .set('Cookie', authSession)
       .expect(400);
   });
 
-  it('throws an error message when some of the requested products do not exist', async () => {
+  it('should throw an error message when some of the requested products do not exist', async () => {
     const productOneId = mongoose.Types.ObjectId();
     const res = await request(server?.listener).post('/api/orders')
       .send({
@@ -45,7 +45,7 @@ describe('order create', () => {
     expect(res.body.message).toEqual(`product ${productOneId} does not exist`);
   });
 
-  it('throws an error message when some of the requested products do not have enough stock', async () => {
+  it('should throw an error message when some of the requested products do not have enough stock', async () => {
     const product = await createProduct({
       id: mongoose.Types.ObjectId().toString(),
       price: 42, quantity: 1, title: 'Some product',
@@ -63,7 +63,7 @@ describe('order create', () => {
     expect(res.body.message).toEqual(`product ${product.id} does not have enough stock`);
   });
 
-  it('successfully creates an order', async () => {
+  it('should successfully create an order', async () => {
     const productOne = await createProduct({
       id: mongoose.Types.ObjectId().toString(),
       price: 42, quantity: 42, title: 'Some product 1',
@@ -87,5 +87,5 @@ describe('order create', () => {
     expect(res.body.products.length).toEqual(2);
   });
 
-  it.todo('emits a "order:created" event');
+  it.todo('should emit a "order:created" event');
 })

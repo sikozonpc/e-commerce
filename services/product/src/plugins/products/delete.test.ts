@@ -3,6 +3,7 @@ import Hapi from '@hapi/hapi';
 import { createServer } from '../../server';
 import mongoose from 'mongoose';
 import { AUTH_COOKIE_NAME, registerTestSession } from '@ecomtiago/common';
+import { natsWrapper } from '../../nats-wrapper';
 
 describe('product delete', () => {
   let server: Hapi.Server | null = null;
@@ -15,14 +16,14 @@ describe('product delete', () => {
     })};`;
   });
 
-  it('fails to delete without auth', () => {
+  it('should fail to delete without auth', () => {
     return request(server?.listener).delete('/api/products/42')
       .expect(401);
   })
 
-  it('successfully deletes a product', async () => {
+  it('should successfully delete a product', async () => {
     const { body: { id } } = await request(server?.listener).post('/api/products')
-      .send({ title: 'sample product', price: 42 })
+      .send({ title: 'sample product', price: 42, quantity: 1 })
       .set('Cookie', authSession)
       .expect(201);
 
@@ -31,11 +32,24 @@ describe('product delete', () => {
       .expect(204);
   });
 
-  it('fails with invalid params', async () => {
+  it('should fails with invalid params', async () => {
     return request(server?.listener).delete('/api/products/12313')
       .set('Cookie', authSession)
       .expect(404);
   });
 
-  it.todo('emits a "product:delete" event');
+
+  it('should emit a "product:deleted" event', async () => {
+    const { body: { id } } = await request(server?.listener).post('/api/products')
+      .send({ title: 'sample product', price: 42, quantity: 1 })
+      .set('Cookie', authSession)
+      .expect(201);
+
+    await request(server?.listener).delete(`/api/products/${id}`)
+      .set('Cookie', authSession)
+      .expect(204);
+
+    // should be called once for the POST and one for the DELETE
+    expect(natsWrapper.client.publish).toHaveBeenCalledTimes(2);
+  });
 })

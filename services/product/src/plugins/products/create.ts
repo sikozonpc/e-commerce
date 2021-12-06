@@ -1,6 +1,5 @@
 import Boom from '@hapi/boom';
 import Hapi, { RouteOptions } from '@hapi/hapi';
-import Joi from 'joi';
 import { ProductCreatedPublisher } from '../../events/publishers/product-created-publisher';
 import { Product, ProductDocument } from '../../models/product';
 import { natsWrapper } from '../../nats-wrapper';
@@ -13,11 +12,7 @@ interface CreatePostPayload {
 
 export const createPostProducts: RouteOptions = {
   validate: {
-    payload: Joi.object({
-      title: Joi.string(),
-      price: Joi.number(),
-      quantity: Joi.number().optional(),
-    }),
+    payload: Product.getSchema(),
   },
   handler: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
     const { price, title, quantity = 0 } = request.payload as CreatePostPayload;
@@ -31,6 +26,7 @@ export const createPostProducts: RouteOptions = {
         price: product.price,
         quantity: product.quantity,
         title: product.title,
+        version: product.version,
       });
 
       return h.response(product).code(201);

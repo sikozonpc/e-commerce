@@ -6,6 +6,8 @@ import { Order, OrderStatus } from '../../models/order';
 import { Product } from '../../models/product';
 import { areProductsValid, findProductWithNotEnoughStock } from '../../services/order';
 import { AuthenticatedRequest } from '@ecomtiago/common';
+import { OrderCreatedPublisher } from '../../events/publishers/order-created-publisher';
+import { natsWrapper } from '../../nata-wrapper';
 
 const EXPIRATION_ORDER_SECONDS = 15 * 60 // 15 mins
 
@@ -65,6 +67,20 @@ export const createPostOrders: RouteOptions = {
       await order.save();
 
       // Emit order created event
+      new OrderCreatedPublisher(natsWrapper.client).publish({
+        userId: order.userId,
+        version: order.version,
+        id: order.id,
+        expiresAt: String(order.expiresAt),
+        products: order.products.map((p) => ({
+          id: p.id,
+          price: p.price,
+          title: p.title,
+          version: p.version,
+          quantity: p.quantity,
+        })),
+        status: order.status,
+      });
 
       return h.response(order).code(200);
     } catch (error) {

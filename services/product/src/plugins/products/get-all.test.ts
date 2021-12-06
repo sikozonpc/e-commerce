@@ -15,7 +15,7 @@ describe('product get all', () => {
     })};`;
   });
 
-  it('successfully gets all products', async () => {
+  it('should successfully get all products', async () => {
     await request(server?.listener).post('/api/products')
       .send({ title: 'sample product', price: 42, quantity: 4 })
       .set('Cookie', authSession)

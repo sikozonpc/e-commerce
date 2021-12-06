@@ -1,7 +1,8 @@
+import Joi from 'joi';
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
-interface ProductAttributes {
+export interface ProductAttributes {
   title: string;
   price: number;
   description?: string;
@@ -14,6 +15,8 @@ export interface ProductDocument extends mongoose.Document, ProductAttributes {
 
 interface ProductModel extends mongoose.Model<ProductDocument> {
   build: (attrs: ProductAttributes) => ProductDocument;
+  getSchema: () => Joi.Schema;
+  getPatchableSchema: () => Joi.Schema;
 }
 
 const productSchema = new mongoose.Schema({
@@ -49,6 +52,20 @@ productSchema.set('versionKey', 'version');
 productSchema.plugin(updateIfCurrentPlugin);
 
 productSchema.statics.build = (attrs: ProductAttributes) => new Product(attrs);
+
+productSchema.statics.getSchema = () => Joi.object({
+  title: Joi.string().required(),
+  price: Joi.number().positive().required(),
+  quantity: Joi.number().positive().required(),
+  description: Joi.string(),
+});
+
+productSchema.statics.getPatchableSchema = () => Joi.object({
+  title: Joi.string().optional(),
+  price: Joi.number().positive().optional(),
+  quantity: Joi.number().positive().optional(),
+  description: Joi.string().optional(),
+})
 
 const Product = mongoose.model<ProductDocument, ProductModel>('Product', productSchema);
 export { Product };
