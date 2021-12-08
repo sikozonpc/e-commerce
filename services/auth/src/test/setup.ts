@@ -1,5 +1,4 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 
 let mongodb: MongoMemoryServer | null = null;

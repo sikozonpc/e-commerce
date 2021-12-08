@@ -7,7 +7,7 @@ import { Product } from '../../models/product';
 import { areProductsValid, findProductWithNotEnoughStock } from '../../services/order';
 import { AuthenticatedRequest } from '@ecomtiago/common';
 import { OrderCreatedPublisher } from '../../events/publishers/order-created-publisher';
-import { natsWrapper } from '../../nata-wrapper';
+import { natsWrapper } from '../../nats-wrapper';
 
 const EXPIRATION_ORDER_SECONDS = 15 * 60 // 15 mins
 

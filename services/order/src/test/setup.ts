@@ -40,4 +40,4 @@ export async function createProduct(attr: ProductAttributes) {
   const product = Product.build(attr);
   await product.save();
   return product;
-}
+};

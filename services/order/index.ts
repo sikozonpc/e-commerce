@@ -2,7 +2,7 @@ import { Stan } from 'node-nats-streaming';
 import { connect } from './db';
 import { ProductCreatedListener } from './src/events/listeners/product-created-listener';
 import { ProductDeletedListener } from './src/events/listeners/product-deleted-listener';
-import { natsWrapper } from './src/nata-wrapper';
+import { natsWrapper } from './src/nats-wrapper';
 import { createServer, startServer } from './src/server';
 
 const deferCloseNatsWrapper = async (stan: Stan) => {
