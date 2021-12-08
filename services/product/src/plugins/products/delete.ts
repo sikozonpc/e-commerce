@@ -25,7 +25,7 @@ export const createDeleteProduct: RouteOptions = {
         version: product.id,
       });
 
-      return h.response().code(204);
+      return h.response('success').code(204);
     } catch (error) {
       throw Boom.notFound();
     }

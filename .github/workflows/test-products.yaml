@@ -1,0 +1,14 @@
+name: tests-products
+
+# whenever a pull_request is created/re-opened
+on:
+  pull_request:
+    paths:
+      - "services/product/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd services/product && npm i && npm run test:ci

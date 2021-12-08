@@ -2,6 +2,7 @@ import Hapi from '@hapi/hapi'
 import { createPostOrders } from './create';
 import { createGetOrders } from './get';
 import { createGetOneOrders } from './getOne';
+
 export const register = (server: Hapi.Server) => server.route(
   [
     {

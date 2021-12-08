@@ -1,0 +1,14 @@
+name: tests-orders
+
+# whenever a pull_request is created/re-opened
+on:
+  pull_request:
+    paths:
+      - "services/order/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd services/order && npm i && npm run test:ci
